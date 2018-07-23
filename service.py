@@ -127,7 +127,6 @@ def _handle(event):
                 logger.info(f'SNS Publish Resp: {resp}')
 
 
-@raven_client.capture_exceptions
 def handler(event, context):
     logger.info(f'Lambda Event: {event}')
     _handle(event)
