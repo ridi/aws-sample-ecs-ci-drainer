@@ -1,0 +1,8 @@
+{
+  "handler": "service.handler",
+  "description": "Make status to `DRAINING` when instance of asg terminate.",
+  "runtime": "python3.6",
+  "timeout": 300,
+  "memory": 128,
+  "role": ""
+}
