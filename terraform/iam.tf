@@ -49,7 +49,7 @@ resource "aws_iam_policy" "ecs_ci_drainer_lambda_excution_policy" {
             "Effect": "Allow",
             "Resource": "*",
             "Action": [
-                "sns:ListSubscriptions",
+                "sns:ListSubscriptionsByTopic",
                 "sns:Publish"
             ]
         }

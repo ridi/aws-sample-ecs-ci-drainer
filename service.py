@@ -60,6 +60,26 @@ def _get_task_count_of_container_instance(cluster_name, container_instance_id):
     return len(resp['taskArns'])
 
 
+def _iter_subscriptions(topic_arn: str):
+    next_token = None
+    while True:
+        kwargs = {
+            'TopicArn': topic_arn
+        }
+
+        if next_token:
+            kwargs['NextToken'] = next_token
+
+        response = sns_client.list_subscriptions_by_topic(**kwargs)
+        for subscription in response['Subscriptions']:
+            yield subscription
+
+        if 'NextToken' not in response:
+            break
+
+        next_token = response['NextToken']
+
+
 def _handle(event):
     line = event['Records'][0]['Sns']['Message']
     message = json.loads(line)
@@ -111,12 +131,9 @@ def _handle(event):
 
     if task_count > 0:
         topic_arn = event['Records'][0]['Sns']['TopicArn']
-        response = sns_client.list_subscriptions()
-        for key in response['Subscriptions']:
-            if key['TopicArn'] == topic_arn and key['Protocol'] == 'lambda':
+        for subscription in _iter_subscriptions(topic_arn):
+            if subscription['Protocol'] == 'lambda':
                 logger.info("Publish to SNS topic %s", topic_arn)
-
-                # 10초 대기
                 time.sleep(10)
 
                 resp = sns_client.publish(
